@@ -103,6 +103,128 @@ const CalendarModule: React.FC = () => {
     return event.Title || "Untitled Event";
   };
 
+  const formatDateBox = (startDate: string) => {
+    if (!startDate) return "N/A";
+
+    try {
+      const date = new Date(startDate);
+      const monthNames = [
+        "JAN",
+        "FEB",
+        "MAR",
+        "APR",
+        "MAY",
+        "JUN",
+        "JUL",
+        "AUG",
+        "SEP",
+        "OCT",
+        "NOV",
+        "DEC",
+      ];
+      const month = monthNames[date.getMonth()];
+      const day = date.getDate().toString().padStart(2, "0");
+      return `${month} ${day}`;
+    } catch {
+      return "N/A";
+    }
+  };
+
+  const formatFullDateTime = (
+    startDate: string,
+    endDate: string,
+    isFullDay: string
+  ) => {
+    if (!startDate || !endDate) return "Date not available";
+
+    try {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (isFullDay === "TRUE") {
+        return start.toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      }
+
+      const startFormatted = start.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      const endFormatted = end.toLocaleDateString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      if (start.toDateString() === end.toDateString()) {
+        return `${startFormatted} - ${endFormatted}`;
+      }
+
+      return `${startFormatted} to ${end.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })}`;
+    } catch {
+      return `${startDate} to ${endDate}`;
+    }
+  };
+
+  const getEventLocation = (event: Event) => {
+    const parts = [
+      event.AddressLine1,
+      event.AddressLine2,
+      event.City,
+      event.PostCode,
+      event.Country,
+    ].filter(Boolean);
+
+    return parts.length > 0 ? parts.join(", ") : "Location not specified";
+  };
+
+  const formatCreatedModifiedInfo = (
+    author: string,
+    created: string,
+    editor: string,
+    modified: string
+  ) => {
+    const formatTimestamp = (timestamp: string) => {
+      try {
+        const date = new Date(timestamp);
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        });
+      } catch {
+        return timestamp;
+      }
+    };
+
+    return {
+      created: `Created by ${author || "Unknown"} at ${formatTimestamp(
+        created
+      )}`,
+      modified:
+        author !== editor
+          ? `Modified by ${editor || "Unknown"} at ${formatTimestamp(modified)}`
+          : null,
+    };
+  };
+
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
     setIsDialogOpen(true);
@@ -184,49 +306,268 @@ const CalendarModule: React.FC = () => {
         onDismiss={handleDialogDismiss}
         dialogContentProps={{
           type: DialogType.normal,
-          title: selectedEvent ? getEventTitle(selectedEvent) : "Event Details",
-          subText: "Complete event information from the API",
+          title: "",
+          subText: "",
         }}
         modalProps={{
           isBlocking: false,
-          styles: { main: { maxWidth: 600 } },
+          styles: {
+            main: {
+              width: "90vw",
+              maxWidth: 1200,
+              minHeight: 600,
+            },
+          },
+          className: "custom-dialog",
         }}
       >
         {selectedEvent && (
-          <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-            {Object.entries(selectedEvent).map(([key, value]) => (
+          <div style={{ fontFamily: "Arial, sans-serif" }}>
+            {/* Row 1: Banner Image and Date/Title/Type */}
+            <div style={{ display: "flex", marginBottom: "20px", gap: "20px" }}>
+              {/* Column 1: Banner Image (65%) */}
+              <div style={{ flex: "0 0 65%" }}>
+                {selectedEvent.BannerUrl ? (
+                  <img
+                    src={selectedEvent.BannerUrl}
+                    alt={getEventTitle(selectedEvent)}
+                    style={{
+                      width: "100%",
+                      height: "250px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "250px",
+                      backgroundColor: "#f0f0f0",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#666",
+                      fontSize: "16px",
+                    }}
+                  >
+                    No banner image available
+                  </div>
+                )}
+              </div>
+
+              {/* Column 2: Date Box, Title, Type (35%) */}
               <div
-                key={key}
                 style={{
-                  marginBottom: "12px",
-                  padding: "8px",
-                  border: "1px solid #e1e1e1",
-                  borderRadius: "4px",
-                  backgroundColor: "#f8f9fa",
+                  flex: "0 0 35%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
                 }}
               >
+                {/* Date Box */}
                 <div
                   style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    padding: "15px",
+                    borderRadius: "8px",
+                    textAlign: "center",
+                    fontSize: "18px",
                     fontWeight: "bold",
-                    color: "#333",
-                    marginBottom: "4px",
                   }}
                 >
-                  {key}:
+                  {formatDateBox(selectedEvent.EventStartDate)}
                 </div>
-                <div
-                  style={{
-                    color: "#666",
-                    fontFamily: "monospace",
-                    wordWrap: "break-word",
-                  }}
-                >
-                  {value !== null && value !== undefined
-                    ? String(value)
-                    : "N/A"}
+
+                {/* Title */}
+                <div>
+                  <h2
+                    style={{
+                      margin: "0 0 8px 0",
+                      color: "#333",
+                      fontSize: "20px",
+                      lineHeight: "1.3",
+                    }}
+                  >
+                    {getEventTitle(selectedEvent)}
+                  </h2>
+
+                  {/* Type/Category */}
+                  <div
+                    style={{
+                      display: "inline-block",
+                      backgroundColor: "#e9ecef",
+                      color: "#495057",
+                      padding: "4px 12px",
+                      borderRadius: "16px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    {selectedEvent.Category || "Event"}
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Row 2: Description and Date/Time & Location */}
+            <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+              {/* Column 1: Description (65%) */}
+              <div style={{ flex: "0 0 65%" }}>
+                <h3
+                  style={{
+                    margin: "0 0 10px 0",
+                    color: "#333",
+                    fontSize: "16px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                  }}
+                >
+                  Description
+                </h3>
+                <div
+                  style={{
+                    maxHeight: "200px",
+                    overflowY: "auto",
+                    padding: "15px",
+                    border: "1px solid #e1e1e1",
+                    borderRadius: "6px",
+                    backgroundColor: "#fafafa",
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "#ccc #f0f0f0",
+                  }}
+                  className="custom-scrollbar"
+                >
+                  {selectedEvent.Description ? (
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: selectedEvent.Description,
+                      }}
+                      style={{ color: "#555", lineHeight: "1.5" }}
+                    />
+                  ) : (
+                    <p
+                      style={{ color: "#888", fontStyle: "italic", margin: 0 }}
+                    >
+                      No description available
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Column 2: Date & Time and Location (35%) */}
+              <div style={{ flex: "0 0 35%" }}>
+                {/* Date & Time Section */}
+                <div style={{ marginBottom: "20px" }}>
+                  <h3
+                    style={{
+                      margin: "0 0 10px 0",
+                      color: "#333",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    Date & Time
+                  </h3>
+                  <p
+                    style={{
+                      margin: "0 0 10px 0",
+                      color: "#555",
+                      lineHeight: "1.4",
+                    }}
+                  >
+                    {formatFullDateTime(
+                      selectedEvent.EventStartDate,
+                      selectedEvent.EventEndDate,
+                      selectedEvent.FullDayEvent
+                    )}
+                  </p>
+                  <a
+                    href="#"
+                    style={{
+                      color: "#007bff",
+                      textDecoration: "none",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Add to calendar functionality would go here
+                      alert(
+                        "Add to Calendar functionality would be implemented here"
+                      );
+                    }}
+                  >
+                    📅 Add to Calendar
+                  </a>
+                </div>
+
+                {/* Location Section */}
+                <div>
+                  <h3
+                    style={{
+                      margin: "0 0 10px 0",
+                      color: "#333",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    Location
+                  </h3>
+                  <p
+                    style={{
+                      margin: "0 0 10px 0",
+                      color: "#555",
+                      lineHeight: "1.4",
+                    }}
+                  >
+                    {getEventLocation(selectedEvent)}
+                  </p>
+                  <a
+                    href="#"
+                    style={{
+                      color: "#007bff",
+                      textDecoration: "none",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // View map functionality would go here
+                      alert("View Map functionality would be implemented here");
+                    }}
+                  >
+                    🗺️ View Map
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 3: Created/Modified Information */}
+            <div style={{ borderTop: "1px solid #e1e1e1", paddingTop: "15px" }}>
+              {(() => {
+                const info = formatCreatedModifiedInfo(
+                  selectedEvent.Author,
+                  selectedEvent.Created,
+                  selectedEvent.Editor,
+                  selectedEvent.Modified
+                );
+                return (
+                  <div style={{ color: "#777", fontSize: "13px" }}>
+                    <div style={{ marginBottom: "4px" }}>{info.created}</div>
+                    {info.modified && <div>{info.modified}</div>}
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         )}
 

@@ -1,6 +1,42 @@
 /* Fluent UI CSS */
 @import "~@fluentui/react/dist/css/fabric.min.css";
 
+/* Custom Scrollbar Styles */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #ccc #f0f0f0;
+}
+
+/* Custom Dialog Styles */
+.custom-dialog .ms-Dialog-main {
+  width: 90vw;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.custom-dialog .ms-Modal {
+  width: 90vw;
+  max-width: 1200px;
+}
+
 .App {
   text-align: center;
 }
