@@ -10,7 +10,6 @@ function App() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
         padding: "20px",
       }}
     >

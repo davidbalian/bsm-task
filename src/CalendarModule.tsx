@@ -243,10 +243,27 @@ const CalendarModule: React.FC = () => {
           textAlign: "center",
           maxWidth: "380px",
           width: "100%",
+          backgroundColor: "var(--color-background)",
         }}
       >
-        <h2>Upcoming Events</h2>
-        <p>Loading events...</p>
+        <h2
+          style={{
+            fontSize: "var(--font-size-heading-2)",
+            fontWeight: "var(--font-weight-heading-2)",
+            color: "var(--color-normal)",
+          }}
+        >
+          Upcoming Events
+        </h2>
+        <p
+          style={{
+            fontSize: "var(--font-size-plain-text)",
+            fontWeight: "var(--font-weight-plain-text)",
+            color: "var(--color-normal)",
+          }}
+        >
+          Loading events...
+        </p>
       </div>
     );
   }
@@ -259,19 +276,42 @@ const CalendarModule: React.FC = () => {
           textAlign: "center",
           maxWidth: "380px",
           width: "100%",
+          backgroundColor: "var(--color-background)",
         }}
       >
-        <h2>Upcoming Events</h2>
-        <p style={{ color: "red" }}>Error: {error}</p>
+        <h2
+          style={{
+            fontSize: "var(--font-size-heading-2)",
+            fontWeight: "var(--font-weight-heading-2)",
+            color: "var(--color-normal)",
+          }}
+        >
+          Upcoming Events
+        </h2>
+        <p
+          style={{
+            color: "rgb(213, 17, 31)",
+            fontSize: "var(--font-size-plain-text)",
+            fontWeight: "var(--font-weight-plain-text)",
+          }}
+        >
+          Error: {error}
+        </p>
         <button
           onClick={fetchEvents}
           style={{
             padding: "10px 20px",
-            backgroundColor: "#007bff",
+            backgroundColor: "var(--color-link)",
             color: "white",
             border: "none",
             borderRadius: "4px",
             cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "var(--color-link-hover)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "var(--color-link)";
           }}
         >
           Retry
@@ -284,12 +324,20 @@ const CalendarModule: React.FC = () => {
     <div
       style={{
         padding: "20px",
-        fontFamily: "Arial, sans-serif",
         maxWidth: "380px",
         width: "100%",
+        backgroundColor: "var(--color-background)",
       }}
     >
-      <h2>Upcoming Events</h2>
+      <h2
+        style={{
+          fontSize: "var(--font-size-heading-2)",
+          fontWeight: "var(--font-weight-heading-2)",
+          color: "var(--color-normal)",
+        }}
+      >
+        Upcoming Events
+      </h2>
 
       {events.length === 0 ? (
         <p>No upcoming events found.</p>
@@ -300,7 +348,9 @@ const CalendarModule: React.FC = () => {
               key={event.ID || index}
               onClick={() => handleEventClick(event)}
               style={{
-                fontSize: "18px",
+                fontSize: "var(--font-size-plain-text)",
+                fontWeight: "var(--font-weight-plain-text)",
+                color: "var(--color-normal)",
                 marginBottom: "10px",
                 padding: "8px 0",
                 borderBottom: "1px solid #eee",
@@ -308,10 +358,12 @@ const CalendarModule: React.FC = () => {
                 transition: "background-color 0.2s",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#f5f5f5";
+                e.currentTarget.style.backgroundColor =
+                  "var(--color-background-hover)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.backgroundColor =
+                  "var(--color-background)";
               }}
             >
               {getEventTitle(event)} -{" "}
@@ -343,7 +395,13 @@ const CalendarModule: React.FC = () => {
         }}
       >
         {selectedEvent && (
-          <div style={{ fontFamily: "Arial, sans-serif" }}>
+          <div
+            style={{
+              fontSize: "var(--font-size-plain-text)",
+              fontWeight: "var(--font-weight-plain-text)",
+              color: "var(--color-normal)",
+            }}
+          >
             {/* Row 1: Banner Image and Date/Title/Type */}
             <div style={{ display: "flex", marginBottom: "20px", gap: "20px" }}>
               {/* Column 1: Banner Image (65%) */}
@@ -408,8 +466,9 @@ const CalendarModule: React.FC = () => {
                   <h2
                     style={{
                       margin: "0 0 8px 0",
-                      color: "#333",
-                      fontSize: "20px",
+                      color: "var(--color-normal)",
+                      fontSize: "var(--font-size-heading-2)",
+                      fontWeight: "var(--font-weight-heading-2)",
                       lineHeight: "1.3",
                     }}
                   >
@@ -512,10 +571,16 @@ const CalendarModule: React.FC = () => {
                   <a
                     href="#"
                     style={{
-                      color: "#007bff",
+                      color: "var(--color-link)",
                       textDecoration: "none",
-                      fontSize: "14px",
-                      fontWeight: "500",
+                      fontSize: "var(--font-size-plain-text)",
+                      fontWeight: "var(--font-weight-plain-text)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = "var(--color-link-hover)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = "var(--color-link)";
                     }}
                     onClick={(e) => {
                       e.preventDefault();
@@ -555,10 +620,16 @@ const CalendarModule: React.FC = () => {
                   <a
                     href="#"
                     style={{
-                      color: "#007bff",
+                      color: "var(--color-link)",
                       textDecoration: "none",
-                      fontSize: "14px",
-                      fontWeight: "500",
+                      fontSize: "var(--font-size-plain-text)",
+                      fontWeight: "var(--font-weight-plain-text)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = "var(--color-link-hover)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = "var(--color-link)";
                     }}
                     onClick={(e) => {
                       e.preventDefault();

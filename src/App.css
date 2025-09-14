@@ -1,6 +1,22 @@
 /* Fluent UI CSS */
 @import "~@fluentui/react/dist/css/fabric.min.css";
 
+/* Style Guide Variables */
+:root {
+  /* Colors */
+  --color-normal: rgb(51, 51, 51);
+  --color-link: rgb(3, 120, 124);
+  --color-link-hover: rgb(213, 17, 31);
+  --color-background: rgb(243, 242, 241);
+  --color-background-hover: rgb(237, 235, 233);
+
+  /* Typography */
+  --font-size-plain-text: 14px;
+  --font-weight-plain-text: 400;
+  --font-size-heading-2: 20px;
+  --font-weight-heading-2: 600;
+}
+
 /* Custom Scrollbar Styles */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
@@ -39,6 +55,8 @@
 
 .App {
   text-align: center;
+  background-color: var(--color-background);
+  min-height: 100vh;
 }
 
 .App-logo {
