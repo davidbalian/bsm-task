@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
-import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
-import { Calendar } from "lucide-react";
+import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
+import { DefaultButton } from "@fluentui/react/lib/Button";
+import { Calendar, X } from "lucide-react";
+import "./DialogStyles.css";
 
 interface Event {
   ID: number;
@@ -462,182 +463,86 @@ const CalendarModule: React.FC = () => {
           isBlocking: false,
           styles: {
             main: {
-              width: "90vw",
-              maxWidth: 1200,
+              width: "70vw",
+              maxWidth: 1000,
               minHeight: 600,
+              borderRadius: "0.5rem",
+              padding: 0,
+            },
+            root: {
+              selectors: {
+                ".ms-Dialog-header": {
+                  display: "none",
+                },
+                ".ms-Dialog-inner": {
+                  padding: 0,
+                },
+              },
             },
           },
           className: "custom-dialog",
         }}
       >
         {selectedEvent && (
-          <div
-            style={{
-              fontSize: "var(--font-size-plain-text)",
-              fontWeight: "var(--font-weight-plain-text)",
-              color: "var(--color-normal)",
-            }}
-          >
+          <div className="dialog-content">
             {/* Row 1: Banner Image and Date/Title/Type */}
-            <div style={{ display: "flex", marginBottom: "20px", gap: "20px" }}>
+            <div className="event-header-row">
               {/* Column 1: Banner Image (65%) */}
-              <div style={{ flex: "0 0 65%" }}>
+              <div className="banner-column">
                 {selectedEvent.BannerUrl ? (
                   <img
+                    className="event-banner-image"
                     src={selectedEvent.BannerUrl}
                     alt={getEventTitle(selectedEvent)}
-                    style={{
-                      width: "100%",
-                      height: "250px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                    }}
                   />
                 ) : (
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "250px",
-                      backgroundColor: "#f0f0f0",
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#666",
-                      fontSize: "16px",
-                    }}
-                  >
+                  <div className="banner-placeholder">
                     No banner image available
                   </div>
                 )}
               </div>
 
               {/* Column 2: Date Box, Title, Type (35%) */}
-              <div
-                style={{
-                  flex: "0 0 35%",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "15px",
-                }}
-              >
+              <div className="event-details-column">
                 {/* Date Box */}
-                <div
-                  style={{
-                    backgroundColor: "#007bff",
-                    color: "white",
-                    padding: "15px",
-                    borderRadius: "8px",
-                    textAlign: "center",
-                    fontSize: "18px",
-                    fontWeight: "bold",
-                  }}
-                >
+                <div className="event-date-box">
                   {formatDateBox(selectedEvent.EventStartDate)}
                 </div>
 
-                {/* Title */}
-                <div>
-                  <h2
-                    style={{
-                      margin: "0 0 8px 0",
-                      color: "var(--color-normal)",
-                      fontSize: "var(--font-size-heading-2)",
-                      fontWeight: "var(--font-weight-heading-2)",
-                      lineHeight: "1.3",
-                    }}
-                  >
-                    {getEventTitle(selectedEvent)}
-                  </h2>
+                <h2 className="event-title">{getEventTitle(selectedEvent)}</h2>
 
-                  {/* Type/Category */}
-                  <div
-                    style={{
-                      display: "inline-block",
-                      backgroundColor: "#e9ecef",
-                      color: "#495057",
-                      padding: "4px 12px",
-                      borderRadius: "16px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                    }}
-                  >
-                    {selectedEvent.Category || "Event"}
-                  </div>
+                {/* Type/Category */}
+                <div className="event-category">
+                  {selectedEvent.Category || "Event"}
                 </div>
               </div>
             </div>
 
             {/* Row 2: Description and Date/Time & Location */}
-            <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+            <div className="event-details-row">
               {/* Column 1: Description (65%) */}
-              <div style={{ flex: "0 0 65%" }}>
-                <h3
-                  style={{
-                    margin: "0 0 10px 0",
-                    color: "#333",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                  }}
-                >
-                  Description
-                </h3>
-                <div
-                  style={{
-                    maxHeight: "200px",
-                    overflowY: "auto",
-                    padding: "15px",
-                    border: "1px solid #e1e1e1",
-                    borderRadius: "6px",
-                    backgroundColor: "#fafafa",
-                    scrollbarWidth: "thin",
-                    scrollbarColor: "#ccc #f0f0f0",
-                  }}
-                  className="custom-scrollbar"
-                >
+              <div className="description-column">
+                <h3 className="description-heading">Description</h3>
+                <div className="description-content">
                   {selectedEvent.Description ? (
                     <div
+                      className="description-text"
                       dangerouslySetInnerHTML={{
                         __html: selectedEvent.Description,
                       }}
-                      style={{ color: "#555", lineHeight: "1.5" }}
                     />
                   ) : (
-                    <p
-                      style={{ color: "#888", fontStyle: "italic", margin: 0 }}
-                    >
-                      No description available
-                    </p>
+                    <p className="no-description">No description available</p>
                   )}
                 </div>
               </div>
 
               {/* Column 2: Date & Time and Location (35%) */}
-              <div style={{ flex: "0 0 35%" }}>
+              <div className="datetime-location-column">
                 {/* Date & Time Section */}
-                <div style={{ marginBottom: "20px" }}>
-                  <h3
-                    style={{
-                      margin: "0 0 10px 0",
-                      color: "#333",
-                      fontSize: "16px",
-                      fontWeight: "600",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
-                    Date & Time
-                  </h3>
-                  <p
-                    style={{
-                      margin: "0 0 10px 0",
-                      color: "#555",
-                      lineHeight: "1.4",
-                    }}
-                  >
+                <div className="datetime-section">
+                  <h3 className="datetime-heading">Date & Time</h3>
+                  <p className="datetime-info">
                     {formatFullDateTime(
                       selectedEvent.EventStartDate,
                       selectedEvent.EventEndDate,
@@ -645,19 +550,8 @@ const CalendarModule: React.FC = () => {
                     )}
                   </p>
                   <a
+                    className="add-to-calendar-link"
                     href="#"
-                    style={{
-                      color: "var(--color-link)",
-                      textDecoration: "none",
-                      fontSize: "var(--font-size-plain-text)",
-                      fontWeight: "var(--font-weight-plain-text)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = "var(--color-link-hover)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = "var(--color-link)";
-                    }}
                     onClick={(e) => {
                       e.preventDefault();
                       // Add to calendar functionality would go here
@@ -666,61 +560,33 @@ const CalendarModule: React.FC = () => {
                       );
                     }}
                   >
-                    📅 Add to Calendar
+                    Add to Calendar
                   </a>
                 </div>
 
                 {/* Location Section */}
-                <div>
-                  <h3
-                    style={{
-                      margin: "0 0 10px 0",
-                      color: "#333",
-                      fontSize: "16px",
-                      fontWeight: "600",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
-                    Location
-                  </h3>
-                  <p
-                    style={{
-                      margin: "0 0 10px 0",
-                      color: "#555",
-                      lineHeight: "1.4",
-                    }}
-                  >
+                <div className="location-section">
+                  <h3 className="location-heading">Location</h3>
+                  <p className="location-info">
                     {getEventLocation(selectedEvent)}
                   </p>
                   <a
+                    className="view-map-link"
                     href="#"
-                    style={{
-                      color: "var(--color-link)",
-                      textDecoration: "none",
-                      fontSize: "var(--font-size-plain-text)",
-                      fontWeight: "var(--font-weight-plain-text)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = "var(--color-link-hover)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = "var(--color-link)";
-                    }}
                     onClick={(e) => {
                       e.preventDefault();
                       // View map functionality would go here
                       alert("View Map functionality would be implemented here");
                     }}
                   >
-                    🗺️ View Map
+                    View Map
                   </a>
                 </div>
               </div>
             </div>
 
             {/* Row 3: Created/Modified Information */}
-            <div style={{ borderTop: "1px solid #e1e1e1", paddingTop: "15px" }}>
+            <div className="metadata-section">
               {(() => {
                 const info = formatCreatedModifiedInfo(
                   selectedEvent.Author,
@@ -729,9 +595,11 @@ const CalendarModule: React.FC = () => {
                   selectedEvent.Modified
                 );
                 return (
-                  <div style={{ color: "#777", fontSize: "13px" }}>
-                    <div style={{ marginBottom: "4px" }}>{info.created}</div>
-                    {info.modified && <div>{info.modified}</div>}
+                  <div className="metadata-content">
+                    <div className="created-info">{info.created}</div>
+                    {info.modified && (
+                      <div className="modified-info">{info.modified}</div>
+                    )}
                   </div>
                 );
               })()}
@@ -739,9 +607,31 @@ const CalendarModule: React.FC = () => {
           </div>
         )}
 
-        <DialogFooter>
-          <PrimaryButton onClick={handleDialogDismiss} text="Close" />
-        </DialogFooter>
+        <button
+          className="dialog-close-button"
+          onClick={handleDialogDismiss}
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            padding: "8px",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+          }}
+        >
+          <X size={20} />
+        </button>
       </Dialog>
     </div>
   );
