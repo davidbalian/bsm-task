@@ -1,6 +1,16 @@
 /* Fluent UI CSS */
 @import "~@fluentui/react/dist/css/fabric.min.css";
 
+/* Global Styles */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  height: 100%;
+  overflow: hidden;
+}
+
 /* Style Guide Variables */
 :root {
   /* Colors */
@@ -41,6 +51,30 @@
   scrollbar-color: #ccc #f0f0f0;
 }
 
+/* Calendar Events Custom Scrollbar */
+.calendar-events::-webkit-scrollbar {
+  width: 8px;
+}
+
+.calendar-events::-webkit-scrollbar-track {
+  background: var(--color-background);
+  border-radius: 4px;
+}
+
+.calendar-events::-webkit-scrollbar-thumb {
+  background: var(--color-link);
+  border-radius: 4px;
+}
+
+.calendar-events::-webkit-scrollbar-thumb:hover {
+  background: var(--color-link-hover);
+}
+
+.calendar-events {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-link) var(--color-background);
+}
+
 /* Custom Dialog Styles */
 .custom-dialog .ms-Dialog-main {
   width: 90vw;
@@ -55,8 +89,9 @@
 
 .App {
   text-align: center;
-  background-color: var(--color-background);
-  min-height: 100vh;
+  background-color: white;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .App-logo {

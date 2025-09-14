@@ -10,7 +10,6 @@ function App() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        padding: "20px",
       }}
     >
       <CalendarModule />

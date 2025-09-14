@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
 import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
+import { Calendar } from "lucide-react";
 
 interface Event {
   ID: number;
@@ -32,6 +33,8 @@ const CalendarModule: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [showScrollbar, setShowScrollbar] = useState(false);
+  const eventsContainerRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = async () => {
     try {
@@ -66,6 +69,23 @@ const CalendarModule: React.FC = () => {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  // Check if content overflows and force scrollbar visibility
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (eventsContainerRef.current) {
+        const container = eventsContainerRef.current;
+        const hasOverflow = container.scrollHeight > container.clientHeight;
+        setShowScrollbar(hasOverflow);
+      }
+    };
+
+    // Check immediately after events are loaded
+    if (events.length > 0) {
+      // Use setTimeout to ensure DOM is updated
+      setTimeout(checkOverflow, 0);
+    }
+  }, [events]);
 
   const formatEventDate = (startDate: string, isFullDay: string) => {
     if (!startDate) return "No date";
@@ -240,10 +260,10 @@ const CalendarModule: React.FC = () => {
       <div
         style={{
           padding: "20px",
-          textAlign: "center",
           maxWidth: "380px",
           width: "100%",
-          backgroundColor: "var(--color-background)",
+          backgroundColor: "white",
+          textAlign: "left",
         }}
       >
         <h2
@@ -251,8 +271,12 @@ const CalendarModule: React.FC = () => {
             fontSize: "var(--font-size-heading-2)",
             fontWeight: "var(--font-weight-heading-2)",
             color: "var(--color-normal)",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
+          <Calendar size={20} />
           Upcoming Events
         </h2>
         <p
@@ -273,10 +297,10 @@ const CalendarModule: React.FC = () => {
       <div
         style={{
           padding: "20px",
-          textAlign: "center",
           maxWidth: "380px",
           width: "100%",
-          backgroundColor: "var(--color-background)",
+          backgroundColor: "white",
+          textAlign: "left",
         }}
       >
         <h2
@@ -284,8 +308,12 @@ const CalendarModule: React.FC = () => {
             fontSize: "var(--font-size-heading-2)",
             fontWeight: "var(--font-weight-heading-2)",
             color: "var(--color-normal)",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
+          <Calendar size={20} />
           Upcoming Events
         </h2>
         <p
@@ -326,7 +354,8 @@ const CalendarModule: React.FC = () => {
         padding: "20px",
         maxWidth: "380px",
         width: "100%",
-        backgroundColor: "var(--color-background)",
+        backgroundColor: "white",
+        textAlign: "left",
       }}
     >
       <h2
@@ -334,40 +363,87 @@ const CalendarModule: React.FC = () => {
           fontSize: "var(--font-size-heading-2)",
           fontWeight: "var(--font-weight-heading-2)",
           color: "var(--color-normal)",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          marginBottom: "20px",
         }}
       >
+        <Calendar size={20} />
         Upcoming Events
       </h2>
 
       {events.length === 0 ? (
         <p>No upcoming events found.</p>
       ) : (
-        <div style={{ marginTop: "20px" }}>
+        <div
+          ref={eventsContainerRef}
+          className="calendar-events"
+          style={{
+            maxHeight: "60vh",
+            overflowY: showScrollbar ? "scroll" : "auto",
+          }}
+        >
           {events.map((event, index) => (
             <div
               key={event.ID || index}
-              onClick={() => handleEventClick(event)}
               style={{
                 fontSize: "var(--font-size-plain-text)",
                 fontWeight: "var(--font-weight-plain-text)",
-                color: "var(--color-normal)",
-                marginBottom: "10px",
+                margin: 0,
                 padding: "8px 0",
-                borderBottom: "1px solid #eee",
+                border: "none",
                 cursor: "pointer",
-                transition: "background-color 0.2s",
+                transition: "background-color 0s, color 0s",
+                backgroundColor:
+                  index % 2 === 0 ? "var(--color-background)" : "transparent",
+                textAlign: "left",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor =
                   "var(--color-background-hover)";
+                e.currentTarget.style.transition =
+                  "background-color 150ms ease, color 150ms ease";
+                // Find and style the anchor tag
+                const anchor = e.currentTarget.querySelector(
+                  "a"
+                ) as HTMLElement;
+                if (anchor) {
+                  anchor.style.color = "var(--color-link-hover)";
+                }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor =
-                  "var(--color-background)";
+                  index % 2 === 0 ? "var(--color-background)" : "transparent";
+                e.currentTarget.style.transition =
+                  "background-color 0s, color 0s";
+                // Reset the anchor tag color
+                const anchor = e.currentTarget.querySelector(
+                  "a"
+                ) as HTMLElement;
+                if (anchor) {
+                  anchor.style.color = "var(--color-link)";
+                }
               }}
             >
-              {getEventTitle(event)} -{" "}
-              {formatEventDate(event.EventStartDate, event.FullDayEvent)}
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleEventClick(event);
+                }}
+                style={{
+                  color: "var(--color-link)",
+                  transition: "color 0s",
+                  textAlign: "left",
+                  padding: "0.25rem 0.5rem",
+                  textDecoration: "none",
+                  display: "block",
+                }}
+              >
+                {getEventTitle(event)} -{" "}
+                {formatEventDate(event.EventStartDate, event.FullDayEvent)}
+              </a>
             </div>
           ))}
         </div>
