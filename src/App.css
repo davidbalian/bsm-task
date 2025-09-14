@@ -1,3 +1,6 @@
+/* Fluent UI CSS */
+@import "~@fluentui/react/dist/css/fabric.min.css";
+
 .App {
   text-align: center;
 }

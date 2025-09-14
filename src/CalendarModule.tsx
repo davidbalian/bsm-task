@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
+import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
 
 interface Event {
   ID: number;
@@ -28,6 +30,8 @@ const CalendarModule: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const fetchEvents = async () => {
     try {
@@ -63,92 +67,50 @@ const CalendarModule: React.FC = () => {
     fetchEvents();
   }, []);
 
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return "No date";
-
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } catch {
-      return dateString;
-    }
-  };
-
-  const formatDateRange = (
-    startDate: string,
-    endDate: string,
-    isFullDay: string
-  ) => {
-    if (!startDate || !endDate) return "No date";
+  const formatEventDate = (startDate: string, isFullDay: string) => {
+    if (!startDate) return "No date";
 
     try {
       const start = new Date(startDate);
-      const end = new Date(endDate);
+      const now = new Date();
+      const diffInMs = start.getTime() - now.getTime();
+      const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
 
-      if (isFullDay === "TRUE") {
-        return start.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
+      // If event is less than a week away, show friendly format
+      if (diffInMs > 0 && diffInDays < 7) {
+        if (diffInHours < 24) {
+          if (diffInHours === 1) return "in 1 hour";
+          return `in ${diffInHours} hours`;
+        } else if (diffInDays === 1) {
+          return "in 1 day";
+        } else {
+          return `in ${diffInDays} days`;
+        }
       }
 
-      const startFormatted = start.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-
-      const endFormatted = end.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-
-      // If same day, show time range
-      if (start.toDateString() === end.toDateString()) {
-        return `${startFormatted} - ${end.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}`;
-      }
-
-      return `${startFormatted} to ${endFormatted}`;
+      // Otherwise, show full date in MM/DD/YYYY format
+      const month = (start.getMonth() + 1).toString().padStart(2, "0");
+      const day = start.getDate().toString().padStart(2, "0");
+      const year = start.getFullYear();
+      return `${month}/${day}/${year}`;
     } catch {
-      return `${startDate} to ${endDate}`;
+      return startDate;
     }
-  };
-
-  const stripHtml = (html: string) => {
-    const tmp = document.createElement("DIV");
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || "";
   };
 
   const getEventTitle = (event: Event) => {
     return event.Title || "Untitled Event";
   };
 
-  const getEventLocation = (event: Event) => {
-    const parts = [
-      event.AddressLine1,
-      event.AddressLine2,
-      event.City,
-      event.PostCode,
-      event.Country,
-    ].filter(Boolean);
+  const handleEventClick = (event: Event) => {
+    setSelectedEvent(event);
+    setIsDialogOpen(true);
+  };
 
-    return parts.length > 0 ? parts.join(", ") : "Location not specified";
+  const handleDialogDismiss = () => {
+    setIsDialogOpen(false);
+    setSelectedEvent(null);
   };
 
   if (loading) {
@@ -189,97 +151,89 @@ const CalendarModule: React.FC = () => {
       {events.length === 0 ? (
         <p>No upcoming events found.</p>
       ) : (
-        <div>
+        <div style={{ marginTop: "20px" }}>
           {events.map((event, index) => (
             <div
               key={event.ID || index}
+              onClick={() => handleEventClick(event)}
               style={{
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "15px",
-                marginBottom: "15px",
-                backgroundColor: "#f9f9f9",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                fontSize: "18px",
+                marginBottom: "10px",
+                padding: "8px 0",
+                borderBottom: "1px solid #eee",
+                cursor: "pointer",
+                transition: "background-color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#f5f5f5";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
               }}
             >
-              {event.BannerUrl && (
-                <img
-                  src={event.BannerUrl}
-                  alt={event.Title}
-                  style={{
-                    width: "100%",
-                    maxHeight: "200px",
-                    objectFit: "cover",
-                    borderRadius: "4px",
-                    marginBottom: "10px",
-                  }}
-                />
-              )}
-
-              <h3 style={{ margin: "0 0 10px 0", color: "#333" }}>
-                {getEventTitle(event)}
-              </h3>
-
-              <div style={{ marginBottom: "10px" }}>
-                <span
-                  style={{
-                    backgroundColor: "#007bff",
-                    color: "white",
-                    padding: "2px 8px",
-                    borderRadius: "12px",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {event.Category}
-                </span>
-              </div>
-
-              <p style={{ margin: "5px 0", color: "#666" }}>
-                <strong>📅 Date:</strong>{" "}
-                {formatDateRange(
-                  event.EventStartDate,
-                  event.EventEndDate,
-                  event.FullDayEvent
-                )}
-              </p>
-
-              <p style={{ margin: "5px 0", color: "#666" }}>
-                <strong>📍 Location:</strong> {getEventLocation(event)}
-              </p>
-
-              {event.Description && (
-                <div style={{ margin: "10px 0" }}>
-                  <strong>Description:</strong>
-                  <div
-                    style={{
-                      marginTop: "5px",
-                      color: "#555",
-                      lineHeight: "1.4",
-                    }}
-                    dangerouslySetInnerHTML={{ __html: event.Description }}
-                  />
-                </div>
-              )}
-
-              <div
-                style={{
-                  marginTop: "10px",
-                  paddingTop: "10px",
-                  borderTop: "1px solid #eee",
-                  fontSize: "12px",
-                  color: "#888",
-                }}
-              >
-                <span>By {event.Author}</span>
-                {event.Author !== event.Editor && (
-                  <span> • Edited by {event.Editor}</span>
-                )}
-              </div>
+              {getEventTitle(event)} -{" "}
+              {formatEventDate(event.EventStartDate, event.FullDayEvent)}
             </div>
           ))}
         </div>
       )}
+
+      {/* Event Details Dialog */}
+      <Dialog
+        hidden={!isDialogOpen}
+        onDismiss={handleDialogDismiss}
+        dialogContentProps={{
+          type: DialogType.normal,
+          title: selectedEvent ? getEventTitle(selectedEvent) : "Event Details",
+          subText: "Complete event information from the API",
+        }}
+        modalProps={{
+          isBlocking: false,
+          styles: { main: { maxWidth: 600 } },
+        }}
+      >
+        {selectedEvent && (
+          <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+            {Object.entries(selectedEvent).map(([key, value]) => (
+              <div
+                key={key}
+                style={{
+                  marginBottom: "12px",
+                  padding: "8px",
+                  border: "1px solid #e1e1e1",
+                  borderRadius: "4px",
+                  backgroundColor: "#f8f9fa",
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: "bold",
+                    color: "#333",
+                    marginBottom: "4px",
+                  }}
+                >
+                  {key}:
+                </div>
+                <div
+                  style={{
+                    color: "#666",
+                    fontFamily: "monospace",
+                    wordWrap: "break-word",
+                  }}
+                >
+                  {value !== null && value !== undefined
+                    ? String(value)
+                    : "N/A"}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <DialogFooter>
+          <PrimaryButton onClick={handleDialogDismiss} text="Close" />
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };
