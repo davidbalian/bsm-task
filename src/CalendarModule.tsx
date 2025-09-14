@@ -80,12 +80,75 @@ const CalendarModule: React.FC = () => {
     }
   };
 
-  const getEventTitle = (event: Event) => {
-    return event.title || event.name || event.subject || "Untitled Event";
+  const formatDateRange = (
+    startDate: string,
+    endDate: string,
+    isFullDay: string
+  ) => {
+    if (!startDate || !endDate) return "No date";
+
+    try {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (isFullDay === "TRUE") {
+        return start.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      }
+
+      const startFormatted = start.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      const endFormatted = end.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      // If same day, show time range
+      if (start.toDateString() === end.toDateString()) {
+        return `${startFormatted} - ${end.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`;
+      }
+
+      return `${startFormatted} to ${endFormatted}`;
+    } catch {
+      return `${startDate} to ${endDate}`;
+    }
   };
 
-  const getEventDate = (event: Event) => {
-    return event.date || event.start || event.startDate || event.eventDate;
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  };
+
+  const getEventTitle = (event: Event) => {
+    return event.Title || "Untitled Event";
+  };
+
+  const getEventLocation = (event: Event) => {
+    const parts = [
+      event.AddressLine1,
+      event.AddressLine2,
+      event.City,
+      event.PostCode,
+      event.Country,
+    ].filter(Boolean);
+
+    return parts.length > 0 ? parts.join(", ") : "Location not specified";
   };
 
   if (loading) {
@@ -129,26 +192,90 @@ const CalendarModule: React.FC = () => {
         <div>
           {events.map((event, index) => (
             <div
-              key={event.id || index}
+              key={event.ID || index}
               style={{
                 border: "1px solid #ddd",
                 borderRadius: "8px",
                 padding: "15px",
-                marginBottom: "10px",
+                marginBottom: "15px",
                 backgroundColor: "#f9f9f9",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
               }}
             >
+              {event.BannerUrl && (
+                <img
+                  src={event.BannerUrl}
+                  alt={event.Title}
+                  style={{
+                    width: "100%",
+                    maxHeight: "200px",
+                    objectFit: "cover",
+                    borderRadius: "4px",
+                    marginBottom: "10px",
+                  }}
+                />
+              )}
+
               <h3 style={{ margin: "0 0 10px 0", color: "#333" }}>
                 {getEventTitle(event)}
               </h3>
+
+              <div style={{ marginBottom: "10px" }}>
+                <span
+                  style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    padding: "2px 8px",
+                    borderRadius: "12px",
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {event.Category}
+                </span>
+              </div>
+
               <p style={{ margin: "5px 0", color: "#666" }}>
-                <strong>Date:</strong> {formatDate(getEventDate(event))}
+                <strong>📅 Date:</strong>{" "}
+                {formatDateRange(
+                  event.EventStartDate,
+                  event.EventEndDate,
+                  event.FullDayEvent
+                )}
               </p>
-              {event.description && (
-                <p style={{ margin: "5px 0", color: "#666" }}>
-                  <strong>Description:</strong> {event.description}
-                </p>
+
+              <p style={{ margin: "5px 0", color: "#666" }}>
+                <strong>📍 Location:</strong> {getEventLocation(event)}
+              </p>
+
+              {event.Description && (
+                <div style={{ margin: "10px 0" }}>
+                  <strong>Description:</strong>
+                  <div
+                    style={{
+                      marginTop: "5px",
+                      color: "#555",
+                      lineHeight: "1.4",
+                    }}
+                    dangerouslySetInnerHTML={{ __html: event.Description }}
+                  />
+                </div>
               )}
+
+              <div
+                style={{
+                  marginTop: "10px",
+                  paddingTop: "10px",
+                  borderTop: "1px solid #eee",
+                  fontSize: "12px",
+                  color: "#888",
+                }}
+              >
+                <span>By {event.Author}</span>
+                {event.Author !== event.Editor && (
+                  <span> • Edited by {event.Editor}</span>
+                )}
+              </div>
             </div>
           ))}
         </div>
