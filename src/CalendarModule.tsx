@@ -237,7 +237,14 @@ const CalendarModule: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: "20px", textAlign: "center" }}>
+      <div
+        style={{
+          padding: "20px",
+          textAlign: "center",
+          maxWidth: "380px",
+          width: "100%",
+        }}
+      >
         <h2>Upcoming Events</h2>
         <p>Loading events...</p>
       </div>
@@ -246,7 +253,14 @@ const CalendarModule: React.FC = () => {
 
   if (error) {
     return (
-      <div style={{ padding: "20px", textAlign: "center" }}>
+      <div
+        style={{
+          padding: "20px",
+          textAlign: "center",
+          maxWidth: "380px",
+          width: "100%",
+        }}
+      >
         <h2>Upcoming Events</h2>
         <p style={{ color: "red" }}>Error: {error}</p>
         <button
@@ -267,7 +281,14 @@ const CalendarModule: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+    <div
+      style={{
+        padding: "20px",
+        fontFamily: "Arial, sans-serif",
+        maxWidth: "380px",
+        width: "100%",
+      }}
+    >
       <h2>Upcoming Events</h2>
 
       {events.length === 0 ? (
