@@ -286,7 +286,7 @@
 @media only screen and (max-width: 1024px) {
   .modal-content {
     width: 90vw;
-    height: 90vh;
+    height: 90svh;
   }
 }
 
@@ -296,7 +296,7 @@
   }
   .modal-content {
     width: 95vw;
-    height: 95vh;
+    height: 95svh;
   }
 
   .modal-body .dialog-content {
