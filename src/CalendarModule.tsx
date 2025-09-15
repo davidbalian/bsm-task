@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
-import { DefaultButton } from "@fluentui/react/lib/Button";
-import { Calendar, X } from "lucide-react";
+import { Calendar } from "lucide-react";
+import Modal from "./Modal";
 import "./DialogStyles.css";
 
 interface Event {
@@ -239,10 +238,9 @@ const CalendarModule: React.FC = () => {
       created: `Created by ${author || "Unknown"} at ${formatTimestamp(
         created
       )}`,
-      modified:
-        author !== editor
-          ? `Modified by ${editor || "Unknown"} at ${formatTimestamp(modified)}`
-          : null,
+      modified: `Last modified by ${editor || "Unknown"} at ${formatTimestamp(
+        modified
+      )}`,
     };
   };
 
@@ -450,189 +448,130 @@ const CalendarModule: React.FC = () => {
         </div>
       )}
 
-      {/* Event Details Dialog */}
-      <Dialog
-        hidden={!isDialogOpen}
-        onDismiss={handleDialogDismiss}
-        dialogContentProps={{
-          type: DialogType.normal,
-          title: "",
-          subText: "",
-        }}
-        modalProps={{
-          isBlocking: false,
-          styles: {
-            main: {
-              width: "70vw",
-              maxWidth: 1000,
-              minHeight: 600,
-              borderRadius: "0.5rem",
-              padding: 0,
-            },
-            root: {
-              selectors: {
-                ".ms-Dialog-header": {
-                  display: "none",
-                },
-                ".ms-Dialog-inner": {
-                  padding: 0,
-                },
-              },
-            },
-          },
-          className: "custom-dialog",
-        }}
+      {/* Event Details Modal */}
+      <Modal
+        isOpen={isDialogOpen}
+        onClose={handleDialogDismiss}
+        className="custom-dialog"
       >
         {selectedEvent && (
           <div className="dialog-content">
-            {/* Row 1: Banner Image and Date/Title/Type */}
-            <div className="event-header-row">
-              {/* Column 1: Banner Image (65%) */}
-              <div className="banner-column">
-                {selectedEvent.BannerUrl ? (
-                  <img
-                    className="event-banner-image"
-                    src={selectedEvent.BannerUrl}
-                    alt={getEventTitle(selectedEvent)}
-                  />
-                ) : (
-                  <div className="banner-placeholder">
-                    No banner image available
-                  </div>
-                )}
+            {/* Banner Image and Date/Title/Type */}
+            {/* Column 1: Banner Image (65%) */}
+            <div className="banner-column">
+              {selectedEvent.BannerUrl ? (
+                <img
+                  className="event-banner-image"
+                  src={selectedEvent.BannerUrl}
+                  alt={getEventTitle(selectedEvent)}
+                />
+              ) : (
+                <div className="banner-placeholder">
+                  No banner image available
+                </div>
+              )}
+            </div>
+
+            {/* Column 2: Date Box, Title, Type (35%) */}
+            <div className="event-details-column">
+              {/* Date Box */}
+              <div className="event-date-box">
+                {formatDateBox(selectedEvent.EventStartDate)}
               </div>
 
-              {/* Column 2: Date Box, Title, Type (35%) */}
-              <div className="event-details-column">
-                {/* Date Box */}
-                <div className="event-date-box">
-                  {formatDateBox(selectedEvent.EventStartDate)}
-                </div>
+              <h2 className="event-title">{getEventTitle(selectedEvent)}</h2>
 
-                <h2 className="event-title">{getEventTitle(selectedEvent)}</h2>
-
-                {/* Type/Category */}
-                <div className="event-category">
-                  {selectedEvent.Category || "Event"}
-                </div>
+              {/* Type/Category */}
+              <div className="event-category">
+                {selectedEvent.Category || "Event"}
               </div>
             </div>
 
-            {/* Row 2: Description and Date/Time & Location */}
-            <div className="event-details-row">
-              {/* Column 1: Description (65%) */}
-              <div className="description-column">
-                <h3 className="description-heading">Description</h3>
-                <div className="description-content">
-                  {selectedEvent.Description ? (
-                    <div
-                      className="description-text"
-                      dangerouslySetInnerHTML={{
-                        __html: selectedEvent.Description,
-                      }}
-                    />
-                  ) : (
-                    <p className="no-description">No description available</p>
+            {/* Description and Date/Time & Location */}
+            {/* Column 1: Description (65%) */}
+            <div className="description-column">
+              <h3 className="description-heading">Description</h3>
+              <div className="description-content">
+                {selectedEvent.Description ? (
+                  <div
+                    className="description-text"
+                    dangerouslySetInnerHTML={{
+                      __html: selectedEvent.Description,
+                    }}
+                  />
+                ) : (
+                  <p className="no-description">No description available</p>
+                )}
+              </div>
+            </div>
+
+            {/* Column 2: Date & Time and Location (35%) */}
+            <div className="datetime-location-column">
+              {/* Date & Time Section */}
+              <div className="datetime-section">
+                <h3 className="datetime-heading">Date & Time</h3>
+                <p className="datetime-info">
+                  {formatFullDateTime(
+                    selectedEvent.EventStartDate,
+                    selectedEvent.EventEndDate,
+                    selectedEvent.FullDayEvent
                   )}
-                </div>
+                </p>
+                <a
+                  className="add-to-calendar-link"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Add to calendar functionality would go here
+                    alert(
+                      "Add to Calendar functionality would be implemented here"
+                    );
+                  }}
+                >
+                  Add to Calendar
+                </a>
               </div>
 
-              {/* Column 2: Date & Time and Location (35%) */}
-              <div className="datetime-location-column">
-                {/* Date & Time Section */}
-                <div className="datetime-section">
-                  <h3 className="datetime-heading">Date & Time</h3>
-                  <p className="datetime-info">
-                    {formatFullDateTime(
-                      selectedEvent.EventStartDate,
-                      selectedEvent.EventEndDate,
-                      selectedEvent.FullDayEvent
-                    )}
-                  </p>
-                  <a
-                    className="add-to-calendar-link"
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      // Add to calendar functionality would go here
-                      alert(
-                        "Add to Calendar functionality would be implemented here"
-                      );
-                    }}
-                  >
-                    Add to Calendar
-                  </a>
-                </div>
-
-                {/* Location Section */}
-                <div className="location-section">
-                  <h3 className="location-heading">Location</h3>
-                  <p className="location-info">
-                    {getEventLocation(selectedEvent)}
-                  </p>
-                  <a
-                    className="view-map-link"
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      // View map functionality would go here
-                      alert("View Map functionality would be implemented here");
-                    }}
-                  >
-                    View Map
-                  </a>
-                </div>
+              {/* Location Section */}
+              <div className="location-section">
+                <h3 className="location-heading">Location</h3>
+                <p className="location-info">
+                  {getEventLocation(selectedEvent)}
+                </p>
+                <a
+                  className="view-map-link"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // View map functionality would go here
+                    alert("View Map functionality would be implemented here");
+                  }}
+                >
+                  View Map
+                </a>
               </div>
             </div>
 
             {/* Row 3: Created/Modified Information */}
-            <div className="metadata-section">
-              {(() => {
-                const info = formatCreatedModifiedInfo(
-                  selectedEvent.Author,
-                  selectedEvent.Created,
-                  selectedEvent.Editor,
-                  selectedEvent.Modified
-                );
-                return (
-                  <div className="metadata-content">
-                    <div className="created-info">{info.created}</div>
-                    {info.modified && (
-                      <div className="modified-info">{info.modified}</div>
-                    )}
-                  </div>
-                );
-              })()}
-            </div>
+            {(() => {
+              const info = formatCreatedModifiedInfo(
+                selectedEvent.Author,
+                selectedEvent.Created,
+                selectedEvent.Editor,
+                selectedEvent.Modified
+              );
+              return (
+                <div className="metadata-content">
+                  <div className="created-info">{info.created}</div>
+                  {info.modified && (
+                    <div className="modified-info">{info.modified}</div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         )}
-
-        <button
-          className="dialog-close-button"
-          onClick={handleDialogDismiss}
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            padding: "8px",
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "transparent";
-          }}
-        >
-          <X size={20} />
-        </button>
-      </Dialog>
+      </Modal>
     </div>
   );
 };
