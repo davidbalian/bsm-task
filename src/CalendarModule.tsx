@@ -256,91 +256,25 @@ const CalendarModule: React.FC = () => {
 
   if (loading) {
     return (
-      <div
-        style={{
-          padding: "20px",
-          maxWidth: "380px",
-          width: "100%",
-          backgroundColor: "white",
-          textAlign: "left",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "var(--font-size-heading-2)",
-            fontWeight: "var(--font-weight-heading-2)",
-            color: "var(--color-normal)",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
-        >
+      <div className="calendar-container">
+        <h2 className="calendar-heading">
           <Calendar size={20} />
           Upcoming Events
         </h2>
-        <p
-          style={{
-            fontSize: "var(--font-size-plain-text)",
-            fontWeight: "var(--font-weight-plain-text)",
-            color: "var(--color-normal)",
-          }}
-        >
-          Loading events...
-        </p>
+        <p className="calendar-text">Loading events...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div
-        style={{
-          padding: "20px",
-          maxWidth: "380px",
-          width: "100%",
-          backgroundColor: "white",
-          textAlign: "left",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "var(--font-size-heading-2)",
-            fontWeight: "var(--font-weight-heading-2)",
-            color: "var(--color-normal)",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
-        >
+      <div className="calendar-container">
+        <h2 className="calendar-heading">
           <Calendar size={20} />
           Upcoming Events
         </h2>
-        <p
-          style={{
-            color: "rgb(213, 17, 31)",
-            fontSize: "var(--font-size-plain-text)",
-            fontWeight: "var(--font-weight-plain-text)",
-          }}
-        >
-          Error: {error}
-        </p>
-        <button
-          onClick={fetchEvents}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "var(--color-link)",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "var(--color-link-hover)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "var(--color-link)";
-          }}
-        >
+        <p className="calendar-error-text">Error: {error}</p>
+        <button className="calendar-retry-button" onClick={fetchEvents}>
           Retry
         </button>
       </div>
@@ -348,26 +282,8 @@ const CalendarModule: React.FC = () => {
   }
 
   return (
-    <div
-      style={{
-        padding: "20px",
-        maxWidth: "380px",
-        width: "100%",
-        backgroundColor: "white",
-        textAlign: "left",
-      }}
-    >
-      <h2
-        style={{
-          fontSize: "var(--font-size-heading-2)",
-          fontWeight: "var(--font-weight-heading-2)",
-          color: "var(--color-normal)",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          marginBottom: "20px",
-        }}
-      >
+    <div className="calendar-container">
+      <h2 className="calendar-heading">
         <Calendar size={20} />
         Upcoming Events
       </h2>
@@ -377,67 +293,18 @@ const CalendarModule: React.FC = () => {
       ) : (
         <div
           ref={eventsContainerRef}
-          className="calendar-events"
-          style={{
-            maxHeight: "60vh",
-            overflowY: showScrollbar ? "scroll" : "auto",
-          }}
+          className={`calendar-events ${
+            showScrollbar ? "custom-scrollbar" : ""
+          }`}
         >
           {events.map((event, index) => (
-            <div
-              key={event.ID || index}
-              style={{
-                fontSize: "var(--font-size-plain-text)",
-                fontWeight: "var(--font-weight-plain-text)",
-                margin: 0,
-                padding: "8px 0",
-                border: "none",
-                cursor: "pointer",
-                transition: "background-color 0s, color 0s",
-                backgroundColor:
-                  index % 2 === 0 ? "var(--color-background)" : "transparent",
-                textAlign: "left",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  "var(--color-background-hover)";
-                e.currentTarget.style.transition =
-                  "background-color 150ms ease, color 150ms ease";
-                // Find and style the anchor tag
-                const anchor = e.currentTarget.querySelector(
-                  "a"
-                ) as HTMLElement;
-                if (anchor) {
-                  anchor.style.color = "var(--color-link-hover)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  index % 2 === 0 ? "var(--color-background)" : "transparent";
-                e.currentTarget.style.transition =
-                  "background-color 0s, color 0s";
-                // Reset the anchor tag color
-                const anchor = e.currentTarget.querySelector(
-                  "a"
-                ) as HTMLElement;
-                if (anchor) {
-                  anchor.style.color = "var(--color-link)";
-                }
-              }}
-            >
+            <div key={event.ID || index} className="calendar-event-item">
               <a
+                className="calendar-event-link"
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
                   handleEventClick(event);
-                }}
-                style={{
-                  color: "var(--color-link)",
-                  transition: "color 0s",
-                  textAlign: "left",
-                  padding: "0.25rem 0.5rem",
-                  textDecoration: "none",
-                  display: "block",
                 }}
               >
                 {getEventTitle(event)} -{" "}

@@ -40,41 +40,37 @@ a {
 
 /* Custom Scrollbar Styles */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
+  width: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 4px;
+  background: var(--color-background);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
+  background: var(--color-link);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: var(--color-link-hover);
 }
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #ccc #f0f0f0;
+  scrollbar-color: var(--color-link) var(--color-background);
 }
 
 /* Calendar Events Custom Scrollbar */
 .calendar-events::-webkit-scrollbar {
-  width: 8px;
+  width: 3px;
 }
 
 .calendar-events::-webkit-scrollbar-track {
   background: var(--color-background);
-  border-radius: 4px;
 }
 
 .calendar-events::-webkit-scrollbar-thumb {
   background: var(--color-link);
-  border-radius: 4px;
 }
 
 .calendar-events::-webkit-scrollbar-thumb:hover {
@@ -86,16 +82,16 @@ a {
   scrollbar-color: var(--color-link) var(--color-background);
 }
 
-/* Custom Modal Styles */
-.custom-dialog {
-  /* Custom modal styles are now handled in Modal.tsx component */
-}
+/* Custom Modal Styles are now handled in DialogStyles.css */
 
 .App {
   text-align: center;
   background-color: white;
   height: 100vh;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .App-logo {
