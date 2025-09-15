@@ -187,6 +187,8 @@
   align-items: center;
   justify-content: center;
   z-index: 1001;
+  background-color: #fff;
+  color: var(--color-normal);
   transition: background-color 150ms ease;
 }
 
@@ -283,6 +285,14 @@
   color: var(--color-link-hover);
 }
 
+.calendar-event-link.past-event {
+  color: #666;
+}
+
+.calendar-event-item:hover .calendar-event-link.past-event {
+  color: #999;
+}
+
 @media only screen and (max-width: 1024px) {
   .modal-content {
     width: 90vw;
@@ -318,9 +328,5 @@
 
   .metadata-content {
     margin-top: auto;
-  }
-
-  .modal-close-button {
-    background-color: var(--color-background);
   }
 }

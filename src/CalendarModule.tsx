@@ -58,7 +58,14 @@ const CalendarModule: React.FC = () => {
       // Extract events from the 'value' array
       const extractedEvents: Event[] = data.value || [];
 
-      setEvents(extractedEvents);
+      // Sort events from oldest to newest based on EventStartDate
+      const sortedEvents = extractedEvents.sort((a, b) => {
+        const dateA = new Date(a.EventStartDate);
+        const dateB = new Date(b.EventStartDate);
+        return dateA.getTime() - dateB.getTime(); // Oldest first
+      });
+
+      setEvents(sortedEvents);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch events");
     } finally {
@@ -109,11 +116,11 @@ const CalendarModule: React.FC = () => {
         }
       }
 
-      // Otherwise, show full date in MM/DD/YYYY format
-      const month = (start.getMonth() + 1).toString().padStart(2, "0");
+      // Otherwise, show full date in DD/MM/YYYY format
       const day = start.getDate().toString().padStart(2, "0");
+      const month = (start.getMonth() + 1).toString().padStart(2, "0");
       const year = start.getFullYear();
-      return `${month}/${day}/${year}`;
+      return `${day}/${month}/${year}`;
     } catch {
       return startDate;
     }
@@ -213,6 +220,28 @@ const CalendarModule: React.FC = () => {
     return parts.length > 0 ? parts.join(", ") : "Location not specified";
   };
 
+  const hasValidLocation = (event: Event) => {
+    const parts = [
+      event.AddressLine1,
+      event.AddressLine2,
+      event.City,
+      event.PostCode,
+      event.Country,
+    ].filter(Boolean);
+
+    return parts.length > 0;
+  };
+
+  const isEventInPast = (event: Event) => {
+    try {
+      const eventDate = new Date(event.EventStartDate);
+      const now = new Date();
+      return eventDate < now;
+    } catch {
+      return false;
+    }
+  };
+
   const formatCreatedModifiedInfo = (
     author: string,
     created: string,
@@ -252,6 +281,79 @@ const CalendarModule: React.FC = () => {
   const handleDialogDismiss = () => {
     setIsDialogOpen(false);
     setSelectedEvent(null);
+  };
+
+  const generateICSFile = (event: Event) => {
+    const formatICalDate = (dateString: string, isAllDay: boolean) => {
+      try {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        const seconds = String(date.getSeconds()).padStart(2, "0");
+
+        if (isAllDay) {
+          return `${year}${month}${day}`;
+        } else {
+          return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+        }
+      } catch {
+        return "";
+      }
+    };
+
+    const isAllDay = event.FullDayEvent === "TRUE";
+    const location = getEventLocation(event);
+    const description = event.Description
+      ? event.Description.replace(/<[^>]*>/g, "")
+      : "No description available";
+
+    const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//BSM Task//Calendar Event//EN
+BEGIN:VEVENT
+UID:event-${event.ID}@bsm-task
+SUMMARY:${event.Title || "Untitled Event"}
+DESCRIPTION:${description}
+LOCATION:${location}
+DTSTART${isAllDay ? ";VALUE=DATE" : ""}:${formatICalDate(
+      event.EventStartDate,
+      isAllDay
+    )}
+DTEND${isAllDay ? ";VALUE=DATE" : ""}:${formatICalDate(
+      event.EventEndDate,
+      isAllDay
+    )}
+END:VEVENT
+END:VCALENDAR`.trim();
+
+    return icsContent;
+  };
+
+  const downloadICSFile = (event: Event) => {
+    const icsContent = generateICSFile(event);
+    const blob = new Blob([icsContent], {
+      type: "text/calendar;charset=utf-8",
+    });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${event.Title || "event"}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+  };
+
+  const openInMaps = (event: Event) => {
+    const location = getEventLocation(event);
+    const encodedLocation = encodeURIComponent(location);
+    const mapsUrl = `https://maps.google.com/maps?q=${encodedLocation}`;
+    window.open(mapsUrl, "_blank");
   };
 
   if (loading) {
@@ -300,7 +402,9 @@ const CalendarModule: React.FC = () => {
           {events.map((event, index) => (
             <div key={event.ID || index} className="calendar-event-item">
               <a
-                className="calendar-event-link"
+                className={`calendar-event-link ${
+                  isEventInPast(event) ? "past-event" : ""
+                }`}
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
@@ -389,10 +493,7 @@ const CalendarModule: React.FC = () => {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    // Add to calendar functionality would go here
-                    alert(
-                      "Add to Calendar functionality would be implemented here"
-                    );
+                    downloadICSFile(selectedEvent);
                   }}
                 >
                   Add to Calendar
@@ -405,17 +506,18 @@ const CalendarModule: React.FC = () => {
                 <p className="location-info">
                   {getEventLocation(selectedEvent)}
                 </p>
-                <a
-                  className="view-map-link"
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // View map functionality would go here
-                    alert("View Map functionality would be implemented here");
-                  }}
-                >
-                  View Map
-                </a>
+                {hasValidLocation(selectedEvent) && (
+                  <a
+                    className="view-map-link"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openInMaps(selectedEvent);
+                    }}
+                  >
+                    View Map
+                  </a>
+                )}
               </div>
             </div>
 

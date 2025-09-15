@@ -87,7 +87,7 @@ a {
 .App {
   text-align: center;
   background-color: white;
-  height: 100vh;
+  height: 100svh;
   overflow: hidden;
   display: flex;
   justify-content: center;
