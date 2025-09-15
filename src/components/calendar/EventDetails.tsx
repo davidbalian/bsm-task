@@ -16,8 +16,10 @@ interface EventDetailsProps {
 }
 
 const EventDetails: React.FC<EventDetailsProps> = ({ event }) => {
+  const hasBanner = event.BannerUrl && event.BannerUrl.trim() !== "";
+
   return (
-    <div className="dialog-content">
+    <div className={`dialog-content ${!hasBanner ? "no-banner" : ""}`}>
       {/* Banner Image and Date/Title/Type */}
       {/* Column 1: Banner Image (65%) */}
       <div className="banner-column">

@@ -14,6 +14,15 @@
   grid-column: 1 / 3;
 }
 
+/* No banner layout adjustments */
+.dialog-content.no-banner .banner-column {
+  display: none;
+}
+
+.dialog-content.no-banner .event-details-column {
+  grid-column: 1 / 3;
+}
+
 .event-banner-image {
   width: 100%;
   height: 100%;
