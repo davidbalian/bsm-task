@@ -1,0 +1,90 @@
+/* Calendar Module Styles */
+.calendar-container {
+  padding: 20px;
+  max-width: 380px;
+  width: 100%;
+  background-color: white;
+  text-align: left;
+}
+
+.calendar-heading {
+  font-size: var(--font-size-heading-2);
+  font-weight: var(--font-weight-heading-2);
+  color: var(--color-normal);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.calendar-text {
+  font-size: var(--font-size-plain-text);
+  font-weight: var(--font-weight-plain-text);
+  color: var(--color-normal);
+}
+
+.calendar-error-text {
+  color: rgb(213, 17, 31);
+  font-size: var(--font-size-plain-text);
+  font-weight: var(--font-weight-plain-text);
+}
+
+.calendar-retry-button {
+  padding: 10px 20px;
+  background-color: var(--color-link);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.calendar-retry-button:hover {
+  background-color: var(--color-link-hover);
+}
+
+.calendar-events {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.calendar-event-item {
+  font-size: var(--font-size-plain-text);
+  font-weight: var(--font-weight-plain-text);
+  margin: 0;
+  padding: 8px 0;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0s, color 0s;
+  background-color: transparent;
+  text-align: left;
+}
+
+.calendar-event-item:nth-child(even) {
+  background-color: var(--color-background);
+}
+
+.calendar-event-item:hover {
+  background-color: var(--color-background-hover);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.calendar-event-link {
+  color: var(--color-link);
+  transition: color 0s;
+  text-align: left;
+  padding: 0.25rem 0.5rem;
+  text-decoration: none;
+  display: block;
+}
+
+.calendar-event-item:hover .calendar-event-link {
+  color: var(--color-link-hover);
+}
+
+.calendar-event-link.past-event {
+  color: #666;
+}
+
+.calendar-event-item:hover .calendar-event-link.past-event {
+  color: #999;
+}

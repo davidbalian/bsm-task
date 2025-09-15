@@ -1,6 +1,6 @@
 import React from "react";
-import "./App.css";
-import CalendarModule from "./CalendarModule";
+import "../styles/App.css";
+import CalendarModule from "./calendar/CalendarModule";
 
 function App() {
   return (
