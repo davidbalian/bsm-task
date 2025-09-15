@@ -41,6 +41,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 1rem;
   padding: 0.5rem;
   background-color: var(--color-background);
 }
@@ -280,4 +281,46 @@
 
 .calendar-event-item:hover .calendar-event-link {
   color: var(--color-link-hover);
+}
+
+@media only screen and (max-width: 1024px) {
+  .modal-content {
+    width: 90vw;
+    height: 90vh;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .modal-body .dialog-content {
+    overflow-y: auto;
+  }
+  .modal-content {
+    width: 95vw;
+    height: 95vh;
+  }
+
+  .modal-body .dialog-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .banner-column {
+    min-height: 200px;
+  }
+
+  .event-details-column {
+    padding: 1rem;
+  }
+
+  .description-column {
+    overflow-y: visible;
+  }
+
+  .metadata-content {
+    margin-top: auto;
+  }
+
+  .modal-close-button {
+    background-color: var(--color-background);
+  }
 }
